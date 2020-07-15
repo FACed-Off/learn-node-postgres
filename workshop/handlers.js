@@ -2,10 +2,13 @@ const db = require("./database/connection");
 
 function home(request, response) {
   db.query("SELECT * FROM users").then((result) => {
-    console.log(result);
+    const users = result.rows;
+    // create a list item for each user in the array
+    const userList = users.map((user) => `<li>${user.username}</li>`);
+    response.writeHead(200, { "content-type": "text/html" });
+    // use .join to turn the array into a string
+    response.end(`<ul>${userList.join("")}</ul>`);
   });
-  response.writeHead(200, { "content-type": "text/html" });
-  response.end("<h1>Hello world</h1>");
 }
 
 function newUser(request, response) {
@@ -29,9 +32,20 @@ function createUser(request, response) {
   request.on("end", () => {
     const searchParams = new URLSearchParams(body);
     const data = Object.fromEntries(searchParams);
-    console.log(data); // e.g. { username: "oli", ... }
-    response.writeHead(200, { "content-type": "text/html" });
-    response.end(`<h1>Thanks for submitting</h1>`);
+    const value = [data.username, data.age, data.location]; // e.g. { username: "oli", ... }
+    db.query(
+      "INSERT INTO users(username, age, location) VALUES($1, $2, $3)",
+      value
+    )
+      .then(() => {
+        response.writeHead(200, { "content-type": "text/html" });
+        response.end(`<h1>Thanks for submitting</h1>`);
+      })
+      .catch((error) => {
+        console.log(error);
+        response.writeHead(500, { "content-type": "text/html" });
+        response.end(`<h1>BYEEE</h1>`);
+      });
   });
 }
 
