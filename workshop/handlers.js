@@ -1,6 +1,11 @@
+const db = require("./database/connection");
+
 function home(request, response) {
+  db.query("SELECT * FROM users").then((result) => {
+    console.log(result);
+  });
   response.writeHead(200, { "content-type": "text/html" });
-  response.end(`<h1>Hello world</h1>`);
+  response.end("<h1>Hello world</h1>");
 }
 
 function newUser(request, response) {
@@ -20,7 +25,7 @@ function newUser(request, response) {
 
 function createUser(request, response) {
   let body = "";
-  request.on("data", chunk => (body += chunk));
+  request.on("data", (chunk) => (body += chunk));
   request.on("end", () => {
     const searchParams = new URLSearchParams(body);
     const data = Object.fromEntries(searchParams);
