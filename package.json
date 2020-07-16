@@ -7,8 +7,7 @@
     "babel-polyfill": "^6.26.0",
     "dotenv": "^8.2.0",
     "nodemon": "^2.0.2",
-    "pg": "^7.18.2",
-    "url-search-params-polyfill": "^8.1.0"
+    "pg": "^8.3.0"
   },
   "devDependencies": {},
   "scripts": {

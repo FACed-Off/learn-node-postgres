@@ -32,20 +32,24 @@ function createUser(request, response) {
   request.on("end", () => {
     const searchParams = new URLSearchParams(body);
     const data = Object.fromEntries(searchParams);
-    const value = [data.username, data.age, data.location]; // e.g. { username: "oli", ... }
+    console.log(data); // e.g. { username: "oli", ... }
     db.query(
-      "INSERT INTO users(username, age, location) VALUES($1, $2, $3)",
-      value
-    )
-      .then(() => {
-        response.writeHead(200, { "content-type": "text/html" });
-        response.end(`<h1>Thanks for submitting</h1>`);
-      })
-      .catch((error) => {
+      "INSERT INTO users(username, age, location) VALUES($1,$2,$3)",
+      [data.username, data.age, data.location]
+    ).then(() => {
+      response.writeHead(200, { "content-type": "text/html" });
+      response.end(`<h1>Thanks for submitting</h1>`);
+    }).catch((error) => {
         console.log(error);
-        response.writeHead(500, { "content-type": "text/html" });
-        response.end(`<h1>BYEEE</h1>`);
-      });
+        response.writeHead(500, {"location": "/"});
+        response.end(`<h1>SQL error</h1>`)
+      }
+    )
+    db.query(
+      "SELECT * FROM users"
+    ).then((result) => {
+      console.log(result);
+    })
   });
 }
 
