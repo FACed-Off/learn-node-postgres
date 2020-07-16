@@ -1,11 +1,12 @@
 const db = require("./database/connection");
 
 function home(request, response) {
-  db.query("SELECT * FROM users").then((result) => {
-    console.log(result);
+  db.query("SELECT username FROM users").then((result) => {
+    const users = result.rows;
+    const userList = users.map(user => `<li>${user.username}</li>`);
+    response.writeHead(200, { "content-type": "text/html" });
+    response.end(`<ul>${userList.join("")}</ul>`);
   });
-  response.writeHead(200, { "content-type": "text/html" });
-  response.end("<h1>Hello world</h1>");
 }
 
 function newUser(request, response) {
@@ -30,8 +31,23 @@ function createUser(request, response) {
     const searchParams = new URLSearchParams(body);
     const data = Object.fromEntries(searchParams);
     console.log(data); // e.g. { username: "oli", ... }
-    response.writeHead(200, { "content-type": "text/html" });
-    response.end(`<h1>Thanks for submitting</h1>`);
+    db.query(
+      "INSERT INTO users(username, age, location) VALUES($1,$2,$3)",
+      [data.username, data.age, data.location]
+    ).then(() => {
+      response.writeHead(200, { "content-type": "text/html" });
+      response.end(`<h1>Thanks for submitting</h1>`);
+    }).catch((error) => {
+        console.log(error);
+        response.writeHead(500, {"location": "/"});
+        response.end(`<h1>SQL error</h1>`)
+      }
+    )
+    db.query(
+      "SELECT * FROM users"
+    ).then((result) => {
+      console.log(result);
+    })
   });
 }
 
