@@ -1,10 +1,12 @@
 const db = require("./database/connection");
 
 function home(request, response) {
-  db.query("SELECT username FROM users").then((result) => {
+  db.query("SELECT * FROM users").then((result) => {
     const users = result.rows;
-    const userList = users.map(user => `<li>${user.username}</li>`);
+    // create a list item for each user in the array
+    const userList = users.map((user) => `<li>${user.username}</li>`);
     response.writeHead(200, { "content-type": "text/html" });
+    // use .join to turn the array into a string
     response.end(`<ul>${userList.join("")}</ul>`);
   });
 }
